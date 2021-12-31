@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.derby.jdbc.ClientDriver;
 
 /**
  *
@@ -19,9 +20,9 @@ public class TicTacToeServer extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        Parent root =new FXMLDocumentBase();
         
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root,600,500);
         
         stage.setScene(scene);
         stage.show();
