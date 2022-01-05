@@ -14,6 +14,7 @@ import org.apache.derby.jdbc.ClientDriver;
 
 
 public class DatabaseManage {
+    
     public static Connection connection;
     public static Connection getConn(){
         if(connection ==null){
@@ -26,6 +27,7 @@ public class DatabaseManage {
         }
         return connection;
     }
+
     
    
     
