@@ -12,6 +12,6 @@
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="Tic-Tac-Toe Server" >
     <param name="requiredFXVersion" value="8.0+"/>
   </applet-desc>
-  <jfx:javafx-desc  width="800" height="600" main-class="tic.tac.toe.server.TicTacToeServer"  name="Tic-Tac-Toe Server" />
+  <jfx:javafx-desc  width="800" height="600" main-class="ui.TicTacToeServer"  name="Tic-Tac-Toe Server" />
   <update check="always"/>
 </jnlp>
