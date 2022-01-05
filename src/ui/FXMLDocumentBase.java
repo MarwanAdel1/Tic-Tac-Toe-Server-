@@ -1,18 +1,21 @@
-package tic.tac.toe.server;
+package ui;
 
+import data.ServerRequestsHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
-public  class FXMLDocumentBase extends BorderPane {
+public class FXMLDocumentBase extends BorderPane {
 
     protected final GridPane gridPane;
     protected final ColumnConstraints columnConstraints;
@@ -23,6 +26,9 @@ public  class FXMLDocumentBase extends BorderPane {
     protected final Button btnStart;
     protected final Button btnStop;
     protected final PieChart pieChart;
+    protected final FlowPane flowPane;
+    protected final Label label;
+    protected final Label IpLabel;
 
     public FXMLDocumentBase() {
 
@@ -35,6 +41,9 @@ public  class FXMLDocumentBase extends BorderPane {
         btnStart = new Button();
         btnStop = new Button();
         pieChart = new PieChart();
+        flowPane = new FlowPane();
+        label = new Label();
+        IpLabel = new Label();
 
         setMaxHeight(USE_PREF_SIZE);
         setMaxWidth(USE_PREF_SIZE);
@@ -92,6 +101,20 @@ public  class FXMLDocumentBase extends BorderPane {
         BorderPane.setAlignment(pieChart, javafx.geometry.Pos.CENTER);
         setCenter(pieChart);
 
+        BorderPane.setAlignment(flowPane, javafx.geometry.Pos.CENTER);
+        flowPane.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        flowPane.setHgap(10.0);
+        flowPane.setPrefHeight(55.0);
+        flowPane.setPrefWidth(600.0);
+
+        label.setText("IP : ");
+        label.setFont(new Font("System Bold Italic", 18.0));
+
+        IpLabel.setText("Unknown");
+        IpLabel.setFont(new Font("System Bold", 22.0));
+        flowPane.setPadding(new Insets(0.0, 0.0, 0.0, 30.0));
+        setBottom(flowPane);
+
         gridPane.getColumnConstraints().add(columnConstraints);
         gridPane.getColumnConstraints().add(columnConstraints0);
         gridPane.getRowConstraints().add(rowConstraints);
@@ -99,16 +122,21 @@ public  class FXMLDocumentBase extends BorderPane {
         gridPane.getChildren().add(text);
         gridPane.getChildren().add(btnStart);
         gridPane.getChildren().add(btnStop);
-        
-           
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                new PieChart.Data("Online Player", 50),
-                new PieChart.Data("offline player", 50)
-                
-               );
+        flowPane.getChildren().add(label);
+        flowPane.getChildren().add(IpLabel);
+
+        ObservableList<PieChart.Data> pieChartData
+                = FXCollections.observableArrayList(
+                        new PieChart.Data("Online Player", 70),
+                        new PieChart.Data("offline player", 30)
+                );
         pieChart.setData(pieChartData);
-        pieChart.setTitle("Active Players:");
+        pieChart.setTitle("Active Players");
+
+        btnStart.setOnAction((event) -> {
+            ServerRequestsHandler serverRequestsHandler = new ServerRequestsHandler();
+            IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+        });
 
     }
 }

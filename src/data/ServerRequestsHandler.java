@@ -21,47 +21,47 @@ import java.util.logging.Logger;
  */
 public class ServerRequestsHandler extends Thread {
 
-    ServerSocket serverSocket;
-    Socket socket;
-    DataInputStream dataInputStream;
-    PrintStream printStream;
+    private ServerSocket serverSocket;
+    private Socket socket;
+    private DataInputStream dataInputStream;
+    private PrintStream printStream;
+    private InetAddress address;
 
     public ServerRequestsHandler() {
+
         try {
-            InetAddress address = InetAddress.getLocalHost();
+            address = InetAddress.getLocalHost();
             System.out.println(address.getHostAddress());
-
             serverSocket = new ServerSocket(11114, 10, address);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
+        start();
+    }
+
+    @Override
+    public void run() {
+        try {
             while (true) {
                 socket = serverSocket.accept();
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 printStream = new PrintStream(socket.getOutputStream());
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while (true) {
-                                String messageFromClient = dataInputStream.readLine();
-                                System.out.println("Client Message : " + messageFromClient);
-                                printStream.println("The Message Recieved");
-                            }
-                        } catch (IOException ex) {
-                            Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                }).start();
+                String messageFromClient = dataInputStream.readLine();
+                System.out.println("Client Message : " + messageFromClient);
+                printStream.println("The Message Recieved");
             }
-
-        } catch (UnknownHostException ex) {
-
         } catch (IOException ex) {
             Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }   
-   
+    }
 
-    public static void main(String[] args) {
-        new ServerRequestsHandler();
+    /**
+     * @return the address
+     */
+    public InetAddress getAddress() {
+        return address;
     }
 }
