@@ -15,7 +15,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.*;
-import utility.RequestHandling;
+import utility.ServerRequestHandling;
 
 /**
  *
@@ -25,8 +25,6 @@ public class ServerRequestsHandler extends Thread {
 
     private ServerSocket serverSocket;
     private Socket socket;
-    private DataInputStream dataInputStream;
-    private PrintStream printStream;
     private InetAddress address;
 
     public ServerRequestsHandler() {
@@ -50,11 +48,8 @@ public class ServerRequestsHandler extends Thread {
             while (true) {
                 try {
                     socket = serverSocket.accept();
-                    //dataInputStream = new DataInputStream(socket.getInputStream());
-                    //printStream = new PrintStream(socket.getOutputStream());
-                    //String messageFromClient = dataInputStream.readLine();
-
-                    new RequestHandling(socket);
+                    
+                    new ServerRequestHandling(socket);
                 } catch (IOException ex) {
                     Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -15,14 +15,28 @@ import org.json.*;
  */
 public class JsonConverter {
 
-    public static JSONObject convertRegisterMessageToJson(String userName, String password) {
+    public static JSONObject convertRegisterIdMessageToJson(int id) {
         JSONObject jSONObject=null;
         try {
             jSONObject = new JSONObject();
             jSONObject.put("Header", "Database");
             jSONObject.put("SubHeader", "Register");
-            jSONObject.put("Username", userName);
-            jSONObject.put("Password", password);
+            jSONObject.put("Operation", id);
+
+        } catch (JSONException ex) {
+            System.out.println(ex.getMessage());
+        }
+        System.out.println(jSONObject);
+        return jSONObject;
+    }
+    
+    public static JSONObject convertLoginIdMessageToJson(int id) {
+        JSONObject jSONObject=null;
+        try {
+            jSONObject = new JSONObject();
+            jSONObject.put("Header", "Database");
+            jSONObject.put("SubHeader", "Login");
+            jSONObject.put("Operation", id);
 
         } catch (JSONException ex) {
             System.out.println(ex.getMessage());
