@@ -14,11 +14,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONException;
-
-
-
-
+import org.json.*;
+import utility.RequestHandling;
 
 /**
  *
@@ -49,18 +46,21 @@ public class ServerRequestsHandler extends Thread {
 
     @Override
     public void run() {
-        try {
+        
             while (true) {
-                socket = serverSocket.accept();
-                dataInputStream = new DataInputStream(socket.getInputStream());
-                printStream = new PrintStream(socket.getOutputStream());
-                String messageFromClient = dataInputStream.readLine();
-                System.out.println("Client Message : " + messageFromClient);
-                printStream.println("The Message Recieved");
+                try {
+                    socket = serverSocket.accept();
+                    //dataInputStream = new DataInputStream(socket.getInputStream());
+                    //printStream = new PrintStream(socket.getOutputStream());
+                    //String messageFromClient = dataInputStream.readLine();
+
+                    new RequestHandling(socket);
+                } catch (IOException ex) {
+                    Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
             }
-        } catch (IOException ex) {
-            Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
 
     /**
