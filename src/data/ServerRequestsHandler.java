@@ -14,8 +14,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.json.*;
 import utility.ServerRequestHandling;
+import static utility.ServerRequestHandling.clientData;
 
 /**
  *
@@ -27,8 +32,10 @@ public class ServerRequestsHandler extends Thread {
     private Socket socket;
     private InetAddress address;
 
-    public ServerRequestsHandler() {
+    static Stage stage;
 
+    public ServerRequestsHandler(Stage stage) {
+        this.stage=stage;
         try {
             address = InetAddress.getLocalHost();
             System.out.println(address.getHostAddress());
@@ -38,24 +45,40 @@ public class ServerRequestsHandler extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         start();
+        
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                try {
+                    DatabaseManage databaseManage=new DatabaseManage();
+                    databaseManage.updateAllStatus();
+                    
+                    serverSocket.close();
+                    
+                    Platform.exit();
+                    System.exit(0);
+                } catch (IOException ex) {
+                    Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     @Override
     public void run() {
-        
-            while (true) {
-                try {
-                    socket = serverSocket.accept();
-                    
-                    new ServerRequestHandling(socket);
-                } catch (IOException ex) {
-                    Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
+
+        while (true) {
+            try {
+                socket = serverSocket.accept();
+
+                new ServerRequestHandling(socket, stage);
+            } catch (IOException ex) {
+                Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
-        
+
+        }
+
     }
 
     /**
