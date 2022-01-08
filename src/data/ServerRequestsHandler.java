@@ -26,36 +26,40 @@ import static utility.ServerRequestHandling.clientData;
  *
  * @author Marwan Adel
  */
-public class ServerRequestsHandler extends Thread {
+public class ServerRequestsHandler{
 
     private ServerSocket serverSocket;
     private Socket socket;
     private InetAddress address;
 
+    private boolean flag = false;
+
+    private Thread th;
+
     static Stage stage;
 
-    public ServerRequestsHandler(Stage stage) {
-        this.stage=stage;
+    public static ServerRequestsHandler serverRequestsHandler = null;
+
+    private ServerRequestsHandler(Stage stage) {
+        this.stage = stage;
+
         try {
             address = InetAddress.getLocalHost();
             System.out.println(address.getHostAddress());
-            serverSocket = new ServerSocket(11114, 10, address);
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        start();
-        
+
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
                 try {
-                    DatabaseManage databaseManage=new DatabaseManage();
-                    databaseManage.updateAllStatus();
-                    
-                    serverSocket.close();
-                    
+                    if (!flag) {
+                        DatabaseManage databaseManage = new DatabaseManage();
+                        databaseManage.updateAllStatus();
+
+                        serverSocket.close();
+                    }
                     Platform.exit();
                     System.exit(0);
                 } catch (IOException ex) {
@@ -65,20 +69,59 @@ public class ServerRequestsHandler extends Thread {
         });
     }
 
-    @Override
-    public void run() {
+    public static ServerRequestsHandler createInstance(Stage stage) {
+        if (serverRequestsHandler == null) {
+            serverRequestsHandler = new ServerRequestsHandler(stage);
+        }
+        return serverRequestsHandler;
+    }
 
-        while (true) {
+    public void startServer() {
+        if (!flag) {
             try {
-                socket = serverSocket.accept();
-
-                new ServerRequestHandling(socket, stage);
+                serverSocket = new ServerSocket(11114, 10, address);
             } catch (IOException ex) {
                 Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        }
+            th = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            socket = serverSocket.accept();
 
+                            new ServerRequestHandling(socket, stage);
+                        } catch (IOException ex) {
+                            try {
+                                socket.close();
+                            } catch (IOException ex1) {
+                                Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex1);
+                            }
+                        }
+                    }
+                }
+            });
+            th.start();
+
+            flag = true;
+        }
+    }
+
+    public void stopServer() {
+        if (flag) {
+            th.suspend();
+            flag = false;
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+                serverSocket.close();
+
+            } catch (IOException ex) {
+                Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     /**
@@ -87,4 +130,9 @@ public class ServerRequestsHandler extends Thread {
     public InetAddress getAddress() {
         return address;
     }
+
+    public boolean getFlag() {
+        return flag;
+    }
+
 }

@@ -135,8 +135,19 @@ public class FXMLDocumentBase extends BorderPane {
         pieChart.setTitle("Active Players");
 
         btnStart.setOnAction((event) -> {
-            ServerRequestsHandler serverRequestsHandler = new ServerRequestsHandler(stage);
+            ServerRequestsHandler serverRequestsHandler = ServerRequestsHandler.createInstance(stage);
+            
+            serverRequestsHandler.startServer();
+
             IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+        });
+
+        btnStop.setOnAction((event) -> {
+            ServerRequestsHandler serverRequestsHandler = ServerRequestsHandler.createInstance(stage);
+            
+            serverRequestsHandler.stopServer();
+            
+            IpLabel.setText("Unknown");
         });
 
     }

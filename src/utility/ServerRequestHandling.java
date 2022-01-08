@@ -51,7 +51,6 @@ public class ServerRequestHandling extends Thread { /// Demo
             @Override
             public void handle(WindowEvent event) {
                 try {
-                    System.out.println("Hi 2");
 
                     DatabaseManage databaseManage = new DatabaseManage();
                     databaseManage.updateStatus(id, 0);
@@ -72,11 +71,16 @@ public class ServerRequestHandling extends Thread { /// Demo
 
     @Override
     public void run() {
-        boolean flag=true;
+        boolean flag = true;
         while (flag) {
             try {
                 String messageFromClient = dataInputStream.readLine();
-                requestHandling(messageFromClient);
+                System.out.println(messageFromClient);
+                if (messageFromClient != null) {////////////////////////////////////hnstop l thread
+                    requestHandling(messageFromClient);
+                }else{
+                    flag = false;
+                }
             } catch (SocketException se) {
                 try {
                     DatabaseManage databaseManage = new DatabaseManage();
@@ -86,8 +90,8 @@ public class ServerRequestHandling extends Thread { /// Demo
                     dataInputStream.close();
                     printStream.close();
                     socket.close();
-                    
-                    flag=false;
+
+                    flag = false;
                 } catch (IOException ex) {
                     Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -98,9 +102,8 @@ public class ServerRequestHandling extends Thread { /// Demo
     }
 
     public void requestHandling(String messageFromClient) {
-        JSONObject jSONObject;
         try {
-            jSONObject = new JSONObject(messageFromClient);//
+            JSONObject jSONObject = new JSONObject(messageFromClient);//
             String header = jSONObject.getString("Header");
 
             if (header.equalsIgnoreCase("Database")) { /// to/from Database
@@ -115,16 +118,19 @@ public class ServerRequestHandling extends Thread { /// Demo
                     if (id != -1 && id != -2) {
                         username = databaseManage.getUsername(id);
 
-                        clientData.add(this); /////
-                        
-                        Score score=databaseManage.fetchPlayerScore(id);
+                        clientData.add(this);
+
+                        Score score = databaseManage.fetchPlayerScore(id);
 
                         printStream.println(JsonConverter.convertScoreToJson(score));
                         printStream.println(JsonConverter.convertOnlineUsernameVectorToJson(username));
-                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id,username));
-                    } else if (id != -2 || id != -1) {
-                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id,""));
+                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id, username));
+                    } else if (id == -2 || id == -1) {
+                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id, ""));
                     }
+                } else if (jSONObject.getString("SubHeader").equalsIgnoreCase("GoOffline")) {
+                    databaseManage.updateStatus(id, 0);
+                    clientData.remove(this);
                 }
             } else if (header.equalsIgnoreCase("Invite") || header.equalsIgnoreCase("Invite_Response")) { /// send to another client
 
