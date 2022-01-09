@@ -19,7 +19,7 @@ public class TicTacToeServer extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root =new FXMLDocumentBase(stage);
+        Parent root =new ServerFXML(stage);
         
         Scene scene = new Scene(root,600,500);
         

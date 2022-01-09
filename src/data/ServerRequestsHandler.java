@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,14 +29,14 @@ import static utility.ServerRequestHandling.clientData;
  */
 public class ServerRequestsHandler extends Thread {
 
-    private ServerSocket serverSocket;
-    private Socket socket;
-    private InetAddress address;
+    private static ServerSocket serverSocket;
+    private static Socket socket;
+    private static InetAddress address;
 
     static Stage stage;
 
     public ServerRequestsHandler(Stage stage) {
-        this.stage=stage;
+        this.stage = stage;
         try {
             address = InetAddress.getLocalHost();
             System.out.println(address.getHostAddress());
@@ -46,23 +47,23 @@ public class ServerRequestsHandler extends Thread {
             Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         start();
-        
+
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
                 try {
-                    DatabaseManage databaseManage=new DatabaseManage();
+                    DatabaseManage databaseManage = new DatabaseManage();
                     databaseManage.updateAllStatus();
-                    
+
                     serverSocket.close();
-                    
+
                     Platform.exit();
                     System.exit(0);
                 } catch (IOException ex) {
                     Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        });
+        });  
     }
 
     @Override
@@ -87,4 +88,5 @@ public class ServerRequestsHandler extends Thread {
     public InetAddress getAddress() {
         return address;
     }
+
 }

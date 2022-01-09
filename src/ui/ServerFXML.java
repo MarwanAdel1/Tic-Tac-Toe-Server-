@@ -1,5 +1,6 @@
 package ui;
 
+import data.DatabaseManage;
 import data.ServerRequestsHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,7 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-public class FXMLDocumentBase extends BorderPane {
+public class ServerFXML extends BorderPane {
 
     protected final GridPane gridPane;
     protected final ColumnConstraints columnConstraints;
@@ -30,8 +31,11 @@ public class FXMLDocumentBase extends BorderPane {
     protected final FlowPane flowPane;
     protected final Label label;
     protected final Label IpLabel;
+//trial
+    protected final Button showGraphBtn;
+//trial    
 
-    public FXMLDocumentBase(Stage stage) {
+    public ServerFXML(Stage stage) {
 
         gridPane = new GridPane();
         columnConstraints = new ColumnConstraints();
@@ -45,6 +49,9 @@ public class FXMLDocumentBase extends BorderPane {
         flowPane = new FlowPane();
         label = new Label();
         IpLabel = new Label();
+        //trial
+        showGraphBtn = new Button();
+//trial  
 
         setMaxHeight(USE_PREF_SIZE);
         setMaxWidth(USE_PREF_SIZE);
@@ -91,6 +98,14 @@ public class FXMLDocumentBase extends BorderPane {
         GridPane.setMargin(btnStart, new Insets(-15.0, 0.0, 0.0, 200.0));
         btnStart.setFont(new Font("System Bold", 18.0));
 
+        //trial
+        GridPane.setRowIndex(showGraphBtn, 1);
+        showGraphBtn.setMnemonicParsing(false);
+        showGraphBtn.setText("Show Active Player Graph");
+        GridPane.setMargin(showGraphBtn, new Insets(0.0, 0.0, 0.0, 0.0));
+        showGraphBtn.setFont(new Font("System Bold", 18.0));
+        //trial
+
         GridPane.setColumnIndex(btnStop, 1);
         GridPane.setRowIndex(btnStop, 1);
         btnStop.setMnemonicParsing(false);
@@ -125,18 +140,27 @@ public class FXMLDocumentBase extends BorderPane {
         gridPane.getChildren().add(btnStop);
         flowPane.getChildren().add(label);
         flowPane.getChildren().add(IpLabel);
-
-        ObservableList<PieChart.Data> pieChartData
-                = FXCollections.observableArrayList(
-                        new PieChart.Data("Online Player", 70),
-                        new PieChart.Data("offline player", 30)
-                );
-        pieChart.setData(pieChartData);
-        pieChart.setTitle("Active Players");
-
+        
+        flowPane.getChildren().add(showGraphBtn);
+     
         btnStart.setOnAction((event) -> {
             ServerRequestsHandler serverRequestsHandler = new ServerRequestsHandler(stage);
             IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+        });
+
+
+        showGraphBtn.setOnAction((event) -> {
+            int OnlinePlayers = DatabaseManage.fetchOnlinePlayers();
+            int OfflinePlayers = DatabaseManage.fetchOfflinePlayers();
+
+            ObservableList<PieChart.Data> pieChartDataTrial
+                    = FXCollections.observableArrayList(
+                            new PieChart.Data("Online Player", OnlinePlayers),
+                            new PieChart.Data("offline player", OfflinePlayers)
+                    );
+            pieChart.setData(pieChartDataTrial);
+            pieChart.setTitle("Active Players");
+
         });
 
     }

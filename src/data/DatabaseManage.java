@@ -29,7 +29,7 @@ public class DatabaseManage {
         if (CONNECTION_STATE == null) {
             try {
                 DriverManager.registerDriver(new ClientDriver());
-                CONNECTION_STATE = DriverManager.getConnection("jdbc:derby://localhost:1527/phoneBook", "root", "root");
+                CONNECTION_STATE = DriverManager.getConnection("jdbc:derby://localhost:1527/TicTacToe", "root", "root");
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -250,4 +250,49 @@ public class DatabaseManage {
 
         return score;
     }
+    //trial
+
+    public static int fetchOnlinePlayers() {
+        int CountOnline = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("SELECT COUNT(*) FROM Player_Status WHERE Status = 1 ");
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.next()) {
+                CountOnline = result.getInt(1);
+                System.out.println(CountOnline);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return CountOnline;
+    }
+
+    public static int fetchOfflinePlayers() {
+        int CountOffline = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("SELECT COUNT(*) FROM Player_Status WHERE Status = 0 ");
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.next()) {
+                CountOffline = result.getInt(1);
+                System.out.println(CountOffline);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return CountOffline;
+    }
+    
+    
+    public static void main(String[] args) {
+        fetchOnlinePlayers();
+        fetchOfflinePlayers();
+    }
+
+    //trial   
 }

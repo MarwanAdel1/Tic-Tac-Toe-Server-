@@ -72,7 +72,7 @@ public class ServerRequestHandling extends Thread { /// Demo
 
     @Override
     public void run() {
-        boolean flag=true;
+        boolean flag = true;
         while (flag) {
             try {
                 String messageFromClient = dataInputStream.readLine();
@@ -86,8 +86,8 @@ public class ServerRequestHandling extends Thread { /// Demo
                     dataInputStream.close();
                     printStream.close();
                     socket.close();
-                    
-                    flag=false;
+
+                    flag = false;
                 } catch (IOException ex) {
                     Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -116,14 +116,14 @@ public class ServerRequestHandling extends Thread { /// Demo
                         username = databaseManage.getUsername(id);
 
                         clientData.add(this); /////
-                        
-                        Score score=databaseManage.fetchPlayerScore(id);
+
+                        Score score = databaseManage.fetchPlayerScore(id);
 
                         printStream.println(JsonConverter.convertScoreToJson(score));
                         printStream.println(JsonConverter.convertOnlineUsernameVectorToJson(username));
-                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id,username));
+                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id, username));
                     } else if (id != -2 || id != -1) {
-                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id,""));
+                        printStream.println(JsonConverter.convertLoginIdMessageToJson(id, ""));
                     }
                 }
             } else if (header.equalsIgnoreCase("Invite") || header.equalsIgnoreCase("Invite_Response")) { /// send to another client
@@ -135,4 +135,5 @@ public class ServerRequestHandling extends Thread { /// Demo
             Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+ 
 }
