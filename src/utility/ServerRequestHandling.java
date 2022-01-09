@@ -43,19 +43,21 @@ public class ServerRequestHandling extends Thread { /// Demo
             printStream = new PrintStream(socket.getOutputStream());
 
             start();
+
         } catch (IOException ex) {
             Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {   //// mwgoda fel serverhandeler
             @Override
             public void handle(WindowEvent event) {
                 try {
 
                     DatabaseManage databaseManage = new DatabaseManage();
-                    databaseManage.updateStatus(id, 0);
+                    databaseManage.updateAllStatus();
 
-                    clientData.remove(this);
+                    sayByeToAll();
+
                     dataInputStream.close();
                     printStream.close();
                     socket.close();
@@ -71,15 +73,14 @@ public class ServerRequestHandling extends Thread { /// Demo
 
     @Override
     public void run() {
-        boolean flag = true;
-        while (flag) {
+        while (true) {
             try {
                 String messageFromClient = dataInputStream.readLine();
                 System.out.println(messageFromClient);
                 if (messageFromClient != null) {////////////////////////////////////hnstop l thread
                     requestHandling(messageFromClient);
-                }else{
-                    flag = false;
+                } else {
+                    stop();
                 }
             } catch (SocketException se) {
                 try {
@@ -91,7 +92,8 @@ public class ServerRequestHandling extends Thread { /// Demo
                     printStream.close();
                     socket.close();
 
-                    flag = false;
+                    stop();
+
                 } catch (IOException ex) {
                     Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -133,12 +135,30 @@ public class ServerRequestHandling extends Thread { /// Demo
                     clientData.remove(this);
                 }
             } else if (header.equalsIgnoreCase("Invite") || header.equalsIgnoreCase("Invite_Response")) { /// send to another client
-
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("OpponentReciever"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                }
+            } else if (header.equalsIgnoreCase("Ready")) {
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("ReadyReciever"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                }
             } else if (header.equalsIgnoreCase("Game")) {
 
             }
         } catch (JSONException ex) {
             Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void sayByeToAll() {
+        for (ServerRequestHandling serverRequestHandling : clientData) {
+            serverRequestHandling.printStream.println(JsonConverter.convertSayByeToJson());
         }
     }
 }

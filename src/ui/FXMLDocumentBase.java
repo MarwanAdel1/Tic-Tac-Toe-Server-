@@ -139,7 +139,7 @@ public class FXMLDocumentBase extends BorderPane {
             
             serverRequestsHandler.startServer();
 
-            IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+//            IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
         });
 
         btnStop.setOnAction((event) -> {

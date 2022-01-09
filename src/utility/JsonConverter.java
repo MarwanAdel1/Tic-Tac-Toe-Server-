@@ -87,4 +87,17 @@ public class JsonConverter {
         return jSONObject;
     }
 
+    public static JSONObject convertSayByeToJson() {
+        JSONObject jSONObject = new JSONObject();
+        try {
+
+            jSONObject.put("Header", "Bye");
+
+        } catch (JSONException ex) {
+            Logger.getLogger(JsonConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return jSONObject;
+    }
+
 }

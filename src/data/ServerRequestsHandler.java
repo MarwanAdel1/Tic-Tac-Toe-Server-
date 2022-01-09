@@ -8,6 +8,7 @@ package data;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,11 +27,12 @@ import static utility.ServerRequestHandling.clientData;
  *
  * @author Marwan Adel
  */
-public class ServerRequestsHandler{
+public class ServerRequestsHandler {
 
     private ServerSocket serverSocket;
     private Socket socket;
-    private InetAddress address;
+    
+    private Inet4Address address;
 
     private boolean flag = false;
 
@@ -42,29 +44,31 @@ public class ServerRequestsHandler{
 
     private ServerRequestsHandler(Stage stage) {
         this.stage = stage;
-
+/*
         try {
-            address = InetAddress.getLocalHost();
-            System.out.println(address.getHostAddress());
+            address = ;
+            System.out.println(address);
         } catch (IOException ex) {
             Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                try {
-                    if (!flag) {
-                        DatabaseManage databaseManage = new DatabaseManage();
-                        databaseManage.updateAllStatus();
-
-                        serverSocket.close();
-                    }
-                    Platform.exit();
-                    System.exit(0);
-                } catch (IOException ex) {
-                    Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
+*/
+        stage.setOnCloseRequest((WindowEvent event) -> { /// na msh fahm logic eny leh 3mltaha hna w f handling s7 wla 3`lt l mfrod en hna 3lashan low mfesh users
+            try { //// hn3ml print 3lashan n4of meen ly 3`al fehom 
+                if (serverSocket != null) {
+                    DatabaseManage databaseManage = new DatabaseManage();
+                    databaseManage.updateAllStatus();
+                    
+                    
+                    
+                    serverSocket.close();
+                } else {
+                    DatabaseManage databaseManage = new DatabaseManage();
+                    databaseManage.updateAllStatus();
                 }
+                Platform.exit();
+                System.exit(0);
+            } catch (IOException ex) {
+                Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
@@ -79,7 +83,7 @@ public class ServerRequestsHandler{
     public void startServer() {
         if (!flag) {
             try {
-                serverSocket = new ServerSocket(11114, 10, address);
+                serverSocket = new ServerSocket(11114);
             } catch (IOException ex) {
                 Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
