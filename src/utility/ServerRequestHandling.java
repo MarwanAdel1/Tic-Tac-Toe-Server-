@@ -33,6 +33,7 @@ public class ServerRequestHandling extends Thread { /// Demo
     PrintStream printStream;
     String username;
     int id;
+    boolean available = true;
 
     public static Vector<ServerRequestHandling> clientData = new Vector<>();
 
@@ -134,7 +135,27 @@ public class ServerRequestHandling extends Thread { /// Demo
                     databaseManage.updateStatus(id, 0);
                     clientData.remove(this);
                 }
-            } else if (header.equalsIgnoreCase("Invite") || header.equalsIgnoreCase("Invite_Response")) { /// send to another client
+            } else if (header.equalsIgnoreCase("Invite")) { /// send to another client
+                boolean isAvailable = false;
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+
+                    if (serverRequestHandling.username.equals(jSONObject.getString("OpponentReciever"))) {
+                        if (serverRequestHandling.available == true) {
+                            serverRequestHandling.printStream.println(jSONObject);
+                            isAvailable = true;
+                        }
+                    }
+                }
+                if (!isAvailable) {
+                    for (int i = 0; i < clientData.size(); i++) {
+                        ServerRequestHandling serverRequestHandling = clientData.get(i);
+                        if (serverRequestHandling.username.equals(jSONObject.getString("InvitationOwner"))) {
+                            serverRequestHandling.printStream.println(JsonConverter.convertNotAvailableToJson());
+                        }
+                    }
+                }
+            } else if (header.equalsIgnoreCase("Invite_Response")) {
                 for (int i = 0; i < clientData.size(); i++) {
                     ServerRequestHandling serverRequestHandling = clientData.get(i);
                     if (serverRequestHandling.username.equals(jSONObject.getString("OpponentReciever"))) {
@@ -145,6 +166,27 @@ public class ServerRequestHandling extends Thread { /// Demo
                 for (int i = 0; i < clientData.size(); i++) {
                     ServerRequestHandling serverRequestHandling = clientData.get(i);
                     if (serverRequestHandling.username.equals(jSONObject.getString("ReadyReciever"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                }
+            } else if (header.equalsIgnoreCase("Available")) {
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("User"))) {
+                        serverRequestHandling.available = jSONObject.getBoolean("Availablity");
+                    }
+                }
+            } else if (header.equalsIgnoreCase("Start")) {
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("OpponentReciever"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                }
+            }else if(header.equalsIgnoreCase("ShowGame")){
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("OpponentPlayer"))) {
                         serverRequestHandling.printStream.println(jSONObject);
                     }
                 }
