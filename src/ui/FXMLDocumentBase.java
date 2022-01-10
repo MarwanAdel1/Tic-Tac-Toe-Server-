@@ -14,6 +14,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 public class FXMLDocumentBase extends BorderPane {
 
@@ -30,7 +31,7 @@ public class FXMLDocumentBase extends BorderPane {
     protected final Label label;
     protected final Label IpLabel;
 
-    public FXMLDocumentBase() {
+    public FXMLDocumentBase(Stage stage) {
 
         gridPane = new GridPane();
         columnConstraints = new ColumnConstraints();
@@ -134,8 +135,19 @@ public class FXMLDocumentBase extends BorderPane {
         pieChart.setTitle("Active Players");
 
         btnStart.setOnAction((event) -> {
-            ServerRequestsHandler serverRequestsHandler = new ServerRequestsHandler();
-            IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+            ServerRequestsHandler serverRequestsHandler = ServerRequestsHandler.createInstance(stage);
+            
+            serverRequestsHandler.startServer();
+
+//            IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+        });
+
+        btnStop.setOnAction((event) -> {
+            ServerRequestsHandler serverRequestsHandler = ServerRequestsHandler.createInstance(stage);
+            
+            serverRequestsHandler.stopServer();
+            
+            IpLabel.setText("Unknown");
         });
 
     }
