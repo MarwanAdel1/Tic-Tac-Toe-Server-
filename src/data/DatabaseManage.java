@@ -59,7 +59,7 @@ public class DatabaseManage {
                 addNewPlayerScore(id);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         } catch (JSONException ex) {
             Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
         }

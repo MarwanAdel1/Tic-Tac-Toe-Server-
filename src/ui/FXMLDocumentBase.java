@@ -108,7 +108,7 @@ public class FXMLDocumentBase extends BorderPane {
         flowPane.setPrefHeight(55.0);
         flowPane.setPrefWidth(600.0);
 
-        label.setText("IP : ");
+        label.setText("Not Started");
         label.setFont(new Font("System Bold Italic", 18.0));
 
         IpLabel.setText("Unknown");
@@ -124,7 +124,7 @@ public class FXMLDocumentBase extends BorderPane {
         gridPane.getChildren().add(btnStart);
         gridPane.getChildren().add(btnStop);
         flowPane.getChildren().add(label);
-        flowPane.getChildren().add(IpLabel);
+  //      flowPane.getChildren().add(IpLabel);
 
         ObservableList<PieChart.Data> pieChartData
                 = FXCollections.observableArrayList(
@@ -139,7 +139,7 @@ public class FXMLDocumentBase extends BorderPane {
             
             serverRequestsHandler.startServer();
 
-//            IpLabel.setText(serverRequestsHandler.getAddress().getHostAddress());
+            label.setText("Running");
         });
 
         btnStop.setOnAction((event) -> {
@@ -147,7 +147,7 @@ public class FXMLDocumentBase extends BorderPane {
             
             serverRequestsHandler.stopServer();
             
-            IpLabel.setText("Unknown");
+            label.setText("Stopped");
         });
 
     }
