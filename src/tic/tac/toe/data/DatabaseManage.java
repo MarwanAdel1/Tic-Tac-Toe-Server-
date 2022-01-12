@@ -20,7 +20,7 @@ public class DatabaseManage {
         if(connection ==null){
         try {
             DriverManager.registerDriver(new ClientDriver());
-             connection=DriverManager.getConnection("jdbc:derby://localhost:1527/PhoneBook","root","root");
+             connection=DriverManager.getConnection("jdbc:derby://localhost:1527/TicTacToeDB","root","root");
         } catch (SQLException ex) {
             Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
         }

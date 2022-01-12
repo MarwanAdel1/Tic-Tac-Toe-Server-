@@ -197,6 +197,21 @@ public class ServerRequestHandling extends Thread { /// Demo
                         serverRequestHandling.printStream.println(jSONObject);
                     }
                 }
+            }else if(header.equalsIgnoreCase("ExitGame")){
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("OpponentPlayer"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                }
+            }
+            else if(header.equalsIgnoreCase("PlayerResult")){
+               for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("Opponent"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                } 
             }
         } catch (JSONException ex) {
             Logger.getLogger(ServerRequestHandling.class.getName()).log(Level.SEVERE, null, ex);

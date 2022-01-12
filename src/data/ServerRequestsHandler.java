@@ -31,8 +31,8 @@ public class ServerRequestsHandler {
 
     private ServerSocket serverSocket;
     private Socket socket;
-    
-    private Inet4Address address;
+
+    private String address;
 
     private boolean flag = false;
 
@@ -44,22 +44,21 @@ public class ServerRequestsHandler {
 
     private ServerRequestsHandler(Stage stage) {
         this.stage = stage;
-/*
+        address = new String();
+
         try {
-            address = ;
+            address = InetAddress.getLocalHost().getHostAddress();
             System.out.println(address);
         } catch (IOException ex) {
             Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-*/
+
         stage.setOnCloseRequest((WindowEvent event) -> { /// na msh fahm logic eny leh 3mltaha hna w f handling s7 wla 3`lt l mfrod en hna 3lashan low mfesh users
             try { //// hn3ml print 3lashan n4of meen ly 3`al fehom 
                 if (serverSocket != null) {
                     DatabaseManage databaseManage = new DatabaseManage();
                     databaseManage.updateAllStatus();
-                    
-                    
-                    
+
                     serverSocket.close();
                 } else {
                     DatabaseManage databaseManage = new DatabaseManage();
@@ -98,7 +97,9 @@ public class ServerRequestsHandler {
                             new ServerRequestHandling(socket, stage);
                         } catch (IOException ex) {
                             try {
-                                socket.close();
+                                if (socket != null) {
+                                    socket.close();
+                                }
                             } catch (IOException ex1) {
                                 Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex1);
                             }
@@ -131,7 +132,7 @@ public class ServerRequestsHandler {
     /**
      * @return the address
      */
-    public InetAddress getAddress() {
+    public String getAddress() {
         return address;
     }
 
