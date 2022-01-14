@@ -10,6 +10,7 @@ package pojo;
  * @author Marwan Adel
  */
 public class Score {
+
     private int id;
     private String username;
     private int played;
@@ -115,5 +116,5 @@ public class Score {
     public void setTotalScore(int totalScore) {
         this.totalScore = totalScore;
     }
-    
+
 }

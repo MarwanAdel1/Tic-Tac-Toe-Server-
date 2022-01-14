@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -20,6 +21,8 @@ import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.json.*;
+import ui.FXMLDocumentBase;
+import utility.JsonConverter;
 import utility.ServerRequestHandling;
 import static utility.ServerRequestHandling.clientData;
 
@@ -41,6 +44,7 @@ public class ServerRequestsHandler {
     static Stage stage;
 
     public static ServerRequestsHandler serverRequestsHandler = null;
+    public static Vector<PrintStream> connected = new Vector<>();
 
     private ServerRequestsHandler(Stage stage) {
         this.stage = stage;
@@ -94,6 +98,8 @@ public class ServerRequestsHandler {
                         try {
                             socket = serverSocket.accept();
 
+                            connected.add(new PrintStream(socket.getOutputStream()));
+
                             new ServerRequestHandling(socket, stage);
                         } catch (IOException ex) {
                             try {
@@ -115,6 +121,13 @@ public class ServerRequestsHandler {
 
     public void stopServer() {
         if (flag) {
+            DatabaseManage databaseManage = new DatabaseManage();
+            databaseManage.updateAllStatus();
+
+            sayByeToAllConnected();
+
+            connected.clear();
+
             th.suspend();
             flag = false;
             try {
@@ -122,20 +135,28 @@ public class ServerRequestsHandler {
                     socket.close();
                 }
                 serverSocket.close();
-
             } catch (IOException ex) {
                 Logger.getLogger(ServerRequestsHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
+    public void sayByeToAllConnected() {
+        for (PrintStream printStream : connected) {
+            printStream.println(JsonConverter.convertSayByeToJson());
+        }
+        connected.clear();
+        clientData.clear();
+
+        DatabaseManage databaseManage = new DatabaseManage();
+        int Online = databaseManage.fetchOnlinePlayers();
+        int Offline = databaseManage.fetchOfflinePlayers();
+        FXMLDocumentBase.updateChart(Online, Offline);
+    }
+
     /**
      * @return the address
      */
-    public String getAddress() {
-        return address;
-    }
-
     public boolean getFlag() {
         return flag;
     }

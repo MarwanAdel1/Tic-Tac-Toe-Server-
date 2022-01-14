@@ -21,6 +21,7 @@ import javafx.stage.WindowEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 import pojo.Score;
+import ui.FXMLDocumentBase;
 
 /**
  *
@@ -125,15 +126,75 @@ public class ServerRequestHandling extends Thread { /// Demo
 
                         Score score = databaseManage.fetchPlayerScore(id);
 
+                        int Online = databaseManage.fetchOnlinePlayers();
+                        int Offline = databaseManage.fetchOfflinePlayers();
+                        Platform.runLater(() -> {
+                            FXMLDocumentBase.updateChart(Online, Offline);
+                        });
+
                         printStream.println(JsonConverter.convertScoreToJson(score));
-                        printStream.println(JsonConverter.convertOnlineUsernameVectorToJson(username));
                         printStream.println(JsonConverter.convertLoginIdMessageToJson(id, username));
+
+                        for (int i = 0; i < clientData.size(); i++) {
+                            ServerRequestHandling serverRequestHandling = clientData.get(i);
+                            serverRequestHandling.printStream.println(JsonConverter.convertOnlineUsernameVectorToJson(serverRequestHandling.username));
+                        }
                     } else if (id == -2 || id == -1) {
                         printStream.println(JsonConverter.convertLoginIdMessageToJson(id, ""));
                     }
                 } else if (jSONObject.getString("SubHeader").equalsIgnoreCase("GoOffline")) {
                     databaseManage.updateStatus(id, 0);
                     clientData.remove(this);
+
+                    int Online = databaseManage.fetchOnlinePlayers();
+                    int Offline = databaseManage.fetchOfflinePlayers();
+                    Platform.runLater(() -> {
+                        FXMLDocumentBase.updateChart(Online, Offline);
+                    });
+
+                    for (int i = 0; i < clientData.size(); i++) {
+                        ServerRequestHandling s = clientData.get(i);
+                        s.printStream.println(JsonConverter.convertOnlineUsernameVectorToJson(s.username));
+                    }
+                } else if (jSONObject.getString("SubHeader").equalsIgnoreCase("UpdateScore")) {
+                    if (jSONObject.getInt("Operation") == 0) {
+                        int result = databaseManage.updatePlayed(jSONObject.getString("Username"));
+                        if (result != 0) {
+                            Score score = databaseManage.fetchPlayerScore(id);
+                            printStream.println(JsonConverter.convertScoreToJson(score));
+                        }
+                    } else if (jSONObject.getInt("Operation") == 1) { //Win
+                        int result = databaseManage.updateWinScore(jSONObject.getString("Username"));
+                        if (result != 0) {
+                            Score score = databaseManage.fetchPlayerScore(id);
+                            printStream.println(JsonConverter.convertScoreToJson(score));
+                        }
+                    } else if (jSONObject.getInt("Operation") == 2) { ///Draw
+                        int result = databaseManage.updateDrawScore(jSONObject.getString("Username"));
+                        if (result != 0) {
+                            for (int i = 0; i < clientData.size(); i++) {
+                                ServerRequestHandling serverRequestHandling = clientData.get(i);
+                                if (serverRequestHandling.username.equals(jSONObject.getString("Username"))) {
+                                    Score score = databaseManage.fetchPlayerScore(serverRequestHandling.id);
+                                    serverRequestHandling.printStream.println(JsonConverter.convertScoreToJson(score));
+                                }
+
+                            }
+
+                        }
+                    } else if (jSONObject.getInt("Operation") == 3) { /// lose
+                        int result = databaseManage.updateloseScore(jSONObject.getString("Username"));
+                        if (result != 0) {
+                            for (int i = 0; i < clientData.size(); i++) {
+                                ServerRequestHandling serverRequestHandling = clientData.get(i);
+                                if (serverRequestHandling.username.equals(jSONObject.getString("Username"))) {
+                                    Score score = databaseManage.fetchPlayerScore(serverRequestHandling.id);
+                                    serverRequestHandling.printStream.println(JsonConverter.convertScoreToJson(score));
+                                }
+
+                            }
+                        }
+                    }
                 }
             } else if (header.equalsIgnoreCase("Invite")) { /// send to another client
                 boolean isAvailable = false;
@@ -205,6 +266,13 @@ public class ServerRequestHandling extends Thread { /// Demo
                     }
                 }
             } else if (header.equalsIgnoreCase("CancelOwnerInvite")) {
+                for (int i = 0; i < clientData.size(); i++) {
+                    ServerRequestHandling serverRequestHandling = clientData.get(i);
+                    if (serverRequestHandling.username.equals(jSONObject.getString("OpponentPlayer"))) {
+                        serverRequestHandling.printStream.println(jSONObject);
+                    }
+                }
+            } else if (header.equalsIgnoreCase("CancelResponseInvite")) {
                 for (int i = 0; i < clientData.size(); i++) {
                     ServerRequestHandling serverRequestHandling = clientData.get(i);
                     if (serverRequestHandling.username.equals(jSONObject.getString("OpponentPlayer"))) {

@@ -1,5 +1,6 @@
 package ui;
 
+import data.DatabaseManage;
 import data.ServerRequestsHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,10 +27,11 @@ public class FXMLDocumentBase extends BorderPane {
     protected final Text text;
     protected final Button btnStart;
     protected final Button btnStop;
-    protected final PieChart pieChart;
+    protected static PieChart pieChart;
     protected final FlowPane flowPane;
     protected final Label label;
     protected final Label IpLabel;
+    private static ObservableList<PieChart.Data> pieChartData;
 
     public FXMLDocumentBase(Stage stage) {
 
@@ -82,21 +84,21 @@ public class FXMLDocumentBase extends BorderPane {
         text.setText("Press the button to start and stop recieving and sending play request");
         text.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
         text.setWrappingWidth(572.6708984375);
-        text.setFont(new Font(24.0));
+        text.setFont(new Font("System Bold", 24.0));
         GridPane.setMargin(text, new Insets(5.0, 0.0, 0.0, 0.0));
 
         GridPane.setRowIndex(btnStart, 1);
         btnStart.setMnemonicParsing(false);
         btnStart.setText("Start");
         GridPane.setMargin(btnStart, new Insets(-15.0, 0.0, 0.0, 200.0));
-        btnStart.setFont(new Font("System Bold", 18.0));
+        btnStart.setFont(new Font("System Bold", 20.0));
 
         GridPane.setColumnIndex(btnStop, 1);
         GridPane.setRowIndex(btnStop, 1);
         btnStop.setMnemonicParsing(false);
         btnStop.setText("Stop");
         GridPane.setMargin(btnStop, new Insets(-15.0, 0.0, 0.0, 0.0));
-        btnStop.setFont(new Font("System Bold", 18.0));
+        btnStop.setFont(new Font("System Bold", 20.0));
         setTop(gridPane);
 
         BorderPane.setAlignment(pieChart, javafx.geometry.Pos.CENTER);
@@ -124,19 +126,23 @@ public class FXMLDocumentBase extends BorderPane {
         gridPane.getChildren().add(btnStart);
         gridPane.getChildren().add(btnStop);
         flowPane.getChildren().add(label);
-  //      flowPane.getChildren().add(IpLabel);
+        
+        btnStart.setId("greenButton");
+        btnStop.setId("greenButton");
+        label.setId("greentext");
+        IpLabel.setId("greentext");
+        text.setId("greentext");
 
-        ObservableList<PieChart.Data> pieChartData
-                = FXCollections.observableArrayList(
-                        new PieChart.Data("Online Player", 70),
-                        new PieChart.Data("offline player", 30)
-                );
+        DatabaseManage databaseManage = new DatabaseManage();
+
+        pieChartData = FXCollections.observableArrayList(
+                new PieChart.Data("Online Player", databaseManage.fetchOnlinePlayers()),
+                new PieChart.Data("offline player", databaseManage.fetchOfflinePlayers()));
         pieChart.setData(pieChartData);
-        pieChart.setTitle("Active Players");
 
         btnStart.setOnAction((event) -> {
             ServerRequestsHandler serverRequestsHandler = ServerRequestsHandler.createInstance(stage);
-            
+
             serverRequestsHandler.startServer();
 
             label.setText("Running");
@@ -144,11 +150,19 @@ public class FXMLDocumentBase extends BorderPane {
 
         btnStop.setOnAction((event) -> {
             ServerRequestsHandler serverRequestsHandler = ServerRequestsHandler.createInstance(stage);
-            
+
             serverRequestsHandler.stopServer();
-            
+
             label.setText("Stopped");
         });
+
+    }
+
+    public static void updateChart(int onlinePlayer, int offlinePlayer) {
+        pieChartData = FXCollections.observableArrayList(
+                new PieChart.Data("Online Player", onlinePlayer),
+                new PieChart.Data("offline player", offlinePlayer));
+        pieChart.setData(pieChartData);
 
     }
 }

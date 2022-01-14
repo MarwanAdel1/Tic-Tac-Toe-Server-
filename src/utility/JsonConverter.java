@@ -99,16 +99,16 @@ public class JsonConverter {
 
         return jSONObject;
     }
-    
-    public static JSONObject convertNotAvailableToJson(){
-        JSONObject jSONObject=new JSONObject();
-        
+
+    public static JSONObject convertNotAvailableToJson() {
+        JSONObject jSONObject = new JSONObject();
+
         try {
-            jSONObject.put("Header","NotAvailable");
+            jSONObject.put("Header", "NotAvailable");
         } catch (JSONException ex) {
             Logger.getLogger(JsonConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return jSONObject;
     }
 

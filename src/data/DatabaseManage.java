@@ -250,4 +250,110 @@ public class DatabaseManage {
 
         return score;
     }
+
+    public int fetchOnlinePlayers() {
+        int CountOnline = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("SELECT COUNT(*) FROM Player_Status WHERE Status = 1 ");
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.next()) {
+                CountOnline = result.getInt(1);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return CountOnline;
+    }
+
+    public int fetchOfflinePlayers() {
+        int CountOffline = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("SELECT COUNT(*) FROM Player_Status WHERE Status = 0 ");
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.next()) {
+                CountOffline = result.getInt(1);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return CountOffline;
+    }
+
+    public int updatePlayed(String username) {
+        int result = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("Update Player_SCORES SET Played=(Played+1) WHERE ID=(SELECT ID FROM Players WHERE Username=?)");
+
+            preparedStatement.setString(1, username);
+            result = preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    public int updateWinScore(String username) {
+        int result = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("Update Player_SCORES SET Win=(Win+1) WHERE ID=(SELECT ID FROM Players WHERE Username=?)");
+
+            preparedStatement.setString(1, username);
+            result = preparedStatement.executeUpdate();
+
+            if (result != 0) {
+                preparedStatement = CONNECTION_STATE.prepareStatement("Update Player_SCORES SET Total_Score=(Total_Score+2) WHERE ID=(SELECT ID FROM Players WHERE Username=?)");
+
+                preparedStatement.setString(1, username);
+                result = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    public int updateDrawScore(String username) {
+        int result = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("Update Player_SCORES SET Total_Score=(Total_Score+1) ,Draw=(Draw+1) WHERE ID=(SELECT ID FROM Players WHERE Username=?)");
+
+            preparedStatement.setString(1, username);
+            result = preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    public int updateloseScore(String username) {
+        int result = 0;
+        if (CONNECTION_STATE == null) {
+            CONNECTION_STATE = getConnection();
+        }
+        try {
+            PreparedStatement preparedStatement = CONNECTION_STATE.prepareStatement("Update Player_SCORES SET Lose=(Lose+1) WHERE ID=(SELECT ID FROM Players WHERE Username=?)");
+
+            preparedStatement.setString(1, username);
+            result = preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
 }

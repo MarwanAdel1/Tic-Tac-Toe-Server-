@@ -15,14 +15,16 @@ import javafx.stage.Stage;
  * @author Marwan Adel
  */
 public class TicTacToeServer extends Application {
-    
+
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root =new FXMLDocumentBase(stage);
-        
-        Scene scene = new Scene(root,600,500);
-        
+        Parent root = new FXMLDocumentBase(stage);
+
+        Scene scene = new Scene(root, 600, 500);
+        scene.getStylesheets().add(getClass().getResource("/assets/styles/style.css").toExternalForm());
+        stage.setResizable(false);
         stage.setScene(scene);
+        stage.setTitle("TIC TAC TOE SERVER");
         stage.show();
     }
 
@@ -32,5 +34,5 @@ public class TicTacToeServer extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }
